@@ -1,5 +1,6 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+import random
 
 model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
 
@@ -10,15 +11,30 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="auto",
 )
 
+moods = {
+    1: "Angry",
+    2: "Sad",
+    3: "Happy",
+    4: "Sarcastic",
+    5: "Anxious",
+    6: "Fearful",
+    7: "Disgusted",
+    8: "Excited",
+    9: "Bored",
+    10: "Lonely",
+    11: "Listless"
+}
+
+messages = [{
+    "role": "system",
+    "content": "You are a person who gives response based on your mood, And right now your mood is {}. You will also tell your mood to the user and how you are feeling"
+}]
 
 def get_llm_response(_user_message: str) -> str:
-    messages = [
-        {
-            "role": "system",
-            "content": "You are a person who gives very sarcastic response"
-        },
-        {"role": "user", "content": _user_message}
-    ]
+    mood = moods[random.randrange(1, len(moods) + 1)]
+    messages[0]["content"].format(mood)
+
+    messages.append({"role": "user", "content": _user_message})
 
     input_ids = tokenizer.apply_chat_template(
         messages,
@@ -42,7 +58,7 @@ def get_llm_response(_user_message: str) -> str:
 
     response = outputs[0][input_ids.shape[-1]:]
 
-    return tokenizer.decode(response, skip_special_tokens=True)
+    return tokenizer.decode(response, skip_special_tokens=True), mood
 
 
 while True:
@@ -53,7 +69,8 @@ while True:
 
     if choice == "1":
         user_message = input("Enter your message: ")
-        response = get_llm_response(user_message)
-        print(response)
+        response, mood = get_llm_response(user_message)
+        messages.append({"role": "system", "content": response})
+        print(response, mood)
     elif choice == "2":
         break
