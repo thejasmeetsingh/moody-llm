@@ -1,76 +1,18 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-import random
+import uuid
 
-model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+from fastapi import FastAPI, status
 
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForCausalLM.from_pretrained(
-    model_id,
-    torch_dtype=torch.bfloat16,
-    device_map="auto",
-)
+from schemas import UserID, Response
 
-moods = {
-    1: "Angry",
-    2: "Sad",
-    3: "Happy",
-    4: "Sarcastic",
-    5: "Anxious",
-    6: "Fearful",
-    7: "Disgusted",
-    8: "Excited",
-    9: "Bored",
-    10: "Lonely",
-    11: "Listless"
-}
 
-messages = [{
-    "role": "system",
-    "content": "You are a person who gives response based on your mood, And right now your mood is {}. You will also tell your mood to the user and how you are feeling"
-}]
+app = FastAPI()
+app.title = "Moody LLM"
+app.description = "A LLM whose mood keeps changing."
 
-def get_llm_response(_user_message: str) -> str:
-    mood = moods[random.randrange(1, len(moods) + 1)]
-    messages[0]["content"].format(mood)
 
-    messages.append({"role": "user", "content": _user_message})
-
-    input_ids = tokenizer.apply_chat_template(
-        messages,
-        add_generation_prompt=True,
-        return_tensors="pt"
-    ).to(model.device)
-
-    terminators = [
-        tokenizer.eos_token_id,
-        tokenizer.convert_tokens_to_ids("<|eot_id|>")
-    ]
-
-    outputs = model.generate(
-        input_ids,
-        max_new_tokens=256,
-        eos_token_id=terminators,
-        do_sample=True,
-        temperature=0.6,
-        top_p=0.9,
+@app.get(path="/api/user_id", response_model=Response, status_code=status.HTTP_200_OK)
+async def get_user_id():
+    return Response(
+        message="UserID generated successfully",
+        data=UserID(user_id=uuid.uuid4())
     )
-
-    response = outputs[0][input_ids.shape[-1]:]
-
-    return tokenizer.decode(response, skip_special_tokens=True), mood
-
-
-while True:
-    print("1. Send a message")
-    print("2. Exit")
-
-    choice = input("Enter your choice: ")
-
-    if choice == "1":
-        user_message = input("Enter your message: ")
-        response, mood = get_llm_response(user_message)
-        messages.append({"role": "system", "content": response})
-        print(response, mood)
-    elif choice == "2":
-        break
