@@ -37,15 +37,18 @@ async def get_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis)], u
     response = []
 
     for _history in history:
+        _user: dict[str, str] = _history["user"]
+        _system: dict[str, str] = _history["system"]
+
         response.append(MessageHistory(
             user=UserMessage(
-                message=_history["user"]["message"],
-                timestamp=_history["user"]["timestamp"]
+                message=_user["message"],
+                timestamp=_user["timestamp"]
             ),
             system=SystemMessage(
-                message=_history["system"]["message"],
-                timestamp=_history["system"]["timestamp"],
-                mood=_history["system"]["mood"]
+                message=_system["message"],
+                timestamp=_system["timestamp"],
+                mood=_system["mood"]
             )
         ))
 
