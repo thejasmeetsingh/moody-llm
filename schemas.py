@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, UUID4, Field
 
 
@@ -5,10 +7,27 @@ class UserID(BaseModel):
     user_id: UUID4
 
 
-class SocketMessage(BaseModel):
+class UserMessage(BaseModel):
     message: str = Field(max_length=2000)
+    timestamp: datetime
+
+
+class SystemMessage(BaseModel):
+    message: str
+    mood: int
+    timestamp: datetime
+
+
+class MessageHistory(BaseModel):
+    user: UserMessage
+    system: SystemMessage
 
 
 class Response(BaseModel):
     message: str
-    data: SocketMessage | UserID
+    data: (
+        UserID |
+        UserMessage |
+        SystemMessage |
+        list[MessageHistory]
+    )
