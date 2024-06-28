@@ -29,7 +29,7 @@ async def get_user_id():
 
 @app.get(path="/api/history/{user_id}", response_model=Response, status_code=status.HTTP_200_OK)
 async def get_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis)], user_id: uuid.UUID):
-    history: list[dict[str, dict[str, str]]] | None = await _redis.get(user_id)
+    history: list[dict[str, dict[str, str]]] | None = await _redis.get(str(user_id))
 
     if not history:
         history = []
