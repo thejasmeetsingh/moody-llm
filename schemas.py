@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from pydantic import BaseModel, UUID4, Field
 
 
@@ -9,13 +7,13 @@ class UserID(BaseModel):
 
 class UserMessage(BaseModel):
     message: str = Field(max_length=2000)
-    timestamp: datetime
+    timestamp: str
 
 
 class SystemMessage(BaseModel):
     message: str
     mood: int
-    timestamp: datetime
+    timestamp: str
 
 
 class MessageHistory(BaseModel):
