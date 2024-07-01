@@ -1,10 +1,12 @@
 import uuid
-from typing import Annotated
+import datetime
+from typing import Annotated, Any
 
 import redis.asyncio as redis
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
 from schemas import UserID, UserMessage, SystemMessage, MessageHistory, Response
+from llm import get_llm_response
 
 app = FastAPI()
 app.title = "Moody LLM"
@@ -19,7 +21,14 @@ async def get_redis():
         await r.close()
 
 
-@app.get(path="/api/user_id", response_model=Response, status_code=status.HTTP_200_OK)
+async def get_chat_history(_redis: redis.Redis, user_id: str) -> list:
+    history = await _redis.get(str(user_id))
+    if not history:
+        history = []
+    return history
+
+
+@app.get(path="/api/user_id/", response_model=Response, status_code=status.HTTP_200_OK)
 async def get_user_id():
     return Response(
         message="UserID generated successfully",
@@ -27,13 +36,9 @@ async def get_user_id():
     )
 
 
-@app.get(path="/api/history/{user_id}", response_model=Response, status_code=status.HTTP_200_OK)
+@app.get(path="/api/history/{user_id}/", response_model=Response, status_code=status.HTTP_200_OK)
 async def get_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis)], user_id: uuid.UUID):
-    history: list[dict[str, dict[str, str]]] | None = await _redis.get(str(user_id))
-
-    if not history:
-        history = []
-
+    history: list = get_chat_history(_redis, str(user_id))
     response = []
 
     for _history in history:
@@ -53,3 +58,40 @@ async def get_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis)], u
         ))
 
     return Response(message="Message History", data=response)
+
+
+@app.websocket(path="/chat/{user_id}/")
+async def chat(websocket: WebSocket, user_id: uuid.UUID, _redis: Annotated[redis.Redis, Depends(get_redis)]):
+    await websocket.accept()
+    try:
+        while True:
+            user_message: dict[str, Any] = await websocket.receive_json()
+
+            if not user_message.get("message"):
+                await websocket.send_denial_response()
+                break
+
+            user_message.update({
+                "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
+            })
+
+            history: list = get_chat_history(_redis, str(user_id))
+
+            system_message: dict[str, Any] = get_llm_response(history,
+                                                              user_message["message"])
+
+            system_message.update({
+                "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
+            })
+
+            message = {
+                "user": user_message,
+                "system": system_message
+            }
+
+            history.append(message)
+            _redis.set(str(user_id), history)
+
+            await websocket.send_json(data=user_message)
+    except WebSocketDisconnect:
+        await websocket.close()
