@@ -1,41 +1,39 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
+from lifespan import tokenizer, model
 import random
 
-model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
 
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForCausalLM.from_pretrained(
-    model_id,
-    torch_dtype=torch.bfloat16,
-    device_map="auto",
-)
-
-moods = {
+moods: dict[int, str] = {
     1: "Angry",
     2: "Sad",
     3: "Happy",
     4: "Sarcastic",
-    5: "Anxious",
-    6: "Fearful",
-    7: "Disgusted",
-    8: "Excited",
-    9: "Bored",
-    10: "Lonely",
-    11: "Listless"
+    5: "Fearful",
 }
 
-messages = [{
-    "role": "system",
-    "content": "You are a person who gives response based on your mood, And right now your mood is {}. You will also tell your mood to the user and how you are feeling"
-}]
+prompt: str = "Suppose you are in {} mood, Give the response based on your mood."
 
+def templatize_message_history(history: list) -> list:
+    messages: list[dict[str, str]] = []
+
+    for _history in history:
+        messages.extend([
+            {"role": "system", "content": _history["system"]["message"]},
+            {"role": "user", "content": _history["user"]["message"]},
+        ])
+
+    return messages
+
+def generate_random_mood() -> int:
+    return random.randrange(1, len(moods) + 1)
 
 def get_llm_response(history: list, _user_message: str) -> dict[str, str]:
-    mood = moods[random.randrange(1, len(moods) + 1)]
-    messages[0]["content"].format(mood)
+    messages: list[dict[str, str]] = templatize_message_history(history)
+    mood: str = moods[generate_random_mood()]
 
-    messages.append({"role": "user", "content": _user_message})
+    messages.extend([
+        {"role": "system", "content": prompt.format(mood)},
+        {"role": "user", "content": _user_message}
+    ])
 
     input_ids = tokenizer.apply_chat_template(
         messages,
