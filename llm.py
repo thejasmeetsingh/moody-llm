@@ -31,7 +31,7 @@ messages = [{
 }]
 
 
-def get_llm_response(_user_message: str) -> str:
+def get_llm_response(history: list, _user_message: str) -> dict[str, str]:
     mood = moods[random.randrange(1, len(moods) + 1)]
     messages[0]["content"].format(mood)
 
@@ -58,5 +58,9 @@ def get_llm_response(_user_message: str) -> str:
     )
 
     response = outputs[0][input_ids.shape[-1]:]
+    message = tokenizer.decode(response, skip_special_tokens=True)
 
-    return tokenizer.decode(response, skip_special_tokens=True), mood
+    return {
+        "message": message,
+        "mood": mood
+    }
