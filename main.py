@@ -1,23 +1,41 @@
+import os
 import uuid
 import datetime
 from typing import Annotated, Any
 
 import redis.asyncio as redis
+from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
+from lifespan import load_model
 from schemas import UserID, UserMessage, SystemMessage, MessageHistory, Response
 from llm import get_llm_response
 
-app = FastAPI()
+
+load_dotenv()
+
+app = FastAPI(lifespan=load_model)
 app.title = "Moody LLM"
 app.description = "A LLM whose mood keeps changing."
 
 
 async def get_redis():
-    r = await redis.Redis(decode_responses=True)
+    host = os.getenv("REDIS_HOST")
+    port = os.getenv("REDIS_PORT")
+    password = os.getenv("REDIS_PASSWORD")
+
+    if not host or not port or not password:
+        raise redis.AuthenticationError("Redis credentials were not provided")
+
+    r = await redis.Redis(
+        host=host,
+        port=int(port),
+        password=password,
+        decode_responses=True
+    )
     try:
         yield r
-    except Exception as _:
+    except Exception as e:
         await r.close()
 
 
@@ -37,8 +55,8 @@ async def get_user_id():
 
 
 @app.get(path="/api/history/{user_id}/", response_model=Response, status_code=status.HTTP_200_OK)
-async def get_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis)], user_id: uuid.UUID):
-    history: list = get_chat_history(_redis, str(user_id))
+async def get_user_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis)], user_id: uuid.UUID):
+    history: list = await get_chat_history(_redis, str(user_id))
     response = []
 
     for _history in history:
@@ -75,7 +93,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, _redis: Annotated[redis
                 "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
             })
 
-            history: list = get_chat_history(_redis, str(user_id))
+            history: list = await get_chat_history(_redis, str(user_id))
 
             system_message: dict[str, Any] = get_llm_response(history,
                                                               user_message["message"])
@@ -90,8 +108,8 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, _redis: Annotated[redis
             }
 
             history.append(message)
-            _redis.set(str(user_id), history)
+            await _redis.set(str(user_id), history)
 
-            await websocket.send_json(data=user_message)
+            await websocket.send_json(data=system_message)
     except WebSocketDisconnect:
         await websocket.close()
