@@ -7,14 +7,13 @@ import redis.asyncio as redis
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
-from lifespan import load_model
 from schemas import UserID, UserMessage, SystemMessage, MessageHistory, Response
 from llm import get_llm_response
 
 
 load_dotenv()
 
-app = FastAPI(lifespan=load_model)
+app = FastAPI()
 app.title = "Moody LLM"
 app.description = "A LLM whose mood keeps changing."
 
@@ -35,7 +34,7 @@ async def get_redis():
     )
     try:
         yield r
-    except Exception as e:
+    except redis.RedisError as _:
         await r.close()
 
 
