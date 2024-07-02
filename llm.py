@@ -45,7 +45,7 @@ def generate_random_mood() -> int:
     return random.randrange(1, len(moods) + 1)
 
 
-def get_llm_response(history: list, _user_message: str) -> dict[str, str]:
+async def get_llm_response(history: list, _user_message: str) -> dict[str, str]:
     messages: list = templatize_message_history(history)
     key: int = generate_random_mood()
 

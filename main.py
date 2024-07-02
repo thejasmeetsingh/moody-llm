@@ -94,7 +94,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, _redis: Annotated[redis
 
             history: list = await get_chat_history(_redis, str(user_id))
 
-            system_message: dict[str, Any] = get_llm_response(history,
+            system_message: dict[str, Any] = await get_llm_response(history,
                                                               user_message["message"])
 
             system_message.update({
