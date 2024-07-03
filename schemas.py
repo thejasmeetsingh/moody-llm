@@ -10,7 +10,7 @@ class UserMessage(BaseModel):
     timestamp: str
 
 
-class SystemMessage(BaseModel):
+class AIMessage(BaseModel):
     message: str
     mood: int
     timestamp: str
@@ -18,7 +18,7 @@ class SystemMessage(BaseModel):
 
 class MessageHistory(BaseModel):
     user: UserMessage
-    system: SystemMessage
+    ai: AIMessage
 
 
 class Response(BaseModel):
@@ -26,6 +26,6 @@ class Response(BaseModel):
     data: (
         UserID |
         UserMessage |
-        SystemMessage |
+        AIMessage |
         list[MessageHistory]
     )
