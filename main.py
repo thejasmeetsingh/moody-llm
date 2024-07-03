@@ -1,22 +1,38 @@
-import os
 import uuid
 import datetime
+import traceback
 from typing import Annotated, Any
 
-from dotenv import load_dotenv
-from supabase import AClient
+from dotenv import dotenv_values
+from supabase import AClient, acreate_client
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
-from schemas import UserID, UserMessage, SystemMessage, MessageHistory, Response
-from storage import get_client, get_messages, add_message
+from storage import Storage
 from llm import get_llm_response
-
-
-load_dotenv()
+from schemas import UserID, Response, UserMessage, AIMessage, MessageHistory
 
 app = FastAPI()
 app.title = "Moody LLM"
 app.description = "A LLM whose mood keeps changing."
+
+
+async def get_storage():
+    config = dotenv_values()
+
+    table = config.get("SUPABASE_TABLE_NAME")
+    url = config.get("SUPABASE_URL")
+    key = config.get("SUPABASE_KEY")
+
+    if not table or not url or not key:
+        raise EnvironmentError("Supabase credentials are not provided.")
+
+    client = await acreate_client(url, key)
+    storage = Storage(client=client, table=table)
+    try:
+        yield storage
+    except Exception as e:
+        print(e)
+
 
 
 @app.get(path="/api/user_id/", response_model=Response, status_code=status.HTTP_200_OK)
@@ -28,23 +44,23 @@ async def get_user_id():
 
 
 @app.get(path="/api/history/{user_id}/", response_model=Response, status_code=status.HTTP_200_OK)
-async def get_user_chat_history(client: Annotated[AClient, Depends(get_client)], user_id: uuid.UUID):
-    history: list = await get_messages(client, user_id)
+async def get_user_chat_history(storage: Annotated[Storage, Depends(get_storage)], user_id: uuid.UUID):
+    messages: list = await storage.get_messages(user_id)
     response = []
 
-    for _history in history:
-        _user: dict[str, str] = _history["user"]
-        _system: dict[str, str] = _history["system"]
+    for message in messages:
+        _user: dict[str, str] = message["message"]["user"]
+        _ai: dict[str, str] = message["message"]["ai"]
 
         response.append(MessageHistory(
             user=UserMessage(
                 message=_user["message"],
                 timestamp=_user["timestamp"]
             ),
-            system=SystemMessage(
-                message=_system["message"],
-                timestamp=_system["timestamp"],
-                mood=_system["mood"]
+            ai=AIMessage(
+                message=_ai["message"],
+                timestamp=_ai["timestamp"],
+                mood=_ai["mood"]
             )
         ))
 
@@ -52,7 +68,7 @@ async def get_user_chat_history(client: Annotated[AClient, Depends(get_client)],
 
 
 @app.websocket(path="/chat/{user_id}/")
-async def chat(websocket: WebSocket, user_id: uuid.UUID, client: Annotated[AClient, Depends(get_client)]):
+async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Storage, Depends(get_storage)]):
     await websocket.accept()
     try:
         while True:
@@ -66,21 +82,22 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, client: Annotated[AClie
                 "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
             })
 
-            history: list = await get_messages(client, user_id, limit=25)
+            history: list = await storage.get_messages(user_id, limit=25)
 
-            system_message: dict[str, Any] = await get_llm_response(history,
+            ai_message: dict[str, Any] = await get_llm_response(history,
                                                                     user_message["message"])
 
-            system_message.update({
+            ai_message.update({
                 "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
             })
 
             message = {
                 "user": user_message,
-                "system": system_message
+                "ai": ai_message
             }
 
-            await add_message(client, user_id, message)
-            await websocket.send_json(data=system_message)
+            await storage.add_message(user_id, message)
+
+            await websocket.send_json(data=ai_message)
     except WebSocketDisconnect:
         await websocket.close()

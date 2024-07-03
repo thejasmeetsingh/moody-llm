@@ -32,10 +32,10 @@ moods: dict[int, str] = {
 def templatize_message_history(history: list) -> list:
     messages: list[HumanMessage | AIMessage] = []
 
-    for _history in history:
+    for _history in reversed(history):
         messages.extend([
-            HumanMessage(content=_history["user"]["message"]),
-            AIMessage(content=_history["system"]["message"])
+            HumanMessage(content=_history["message"]["user"]["message"]),
+            AIMessage(content=_history["message"]["ai"]["message"])
         ])
 
     return messages
