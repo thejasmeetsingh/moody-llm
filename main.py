@@ -3,11 +3,12 @@ import uuid
 import datetime
 from typing import Annotated, Any
 
-import redis.asyncio as redis
 from dotenv import load_dotenv
+from supabase import AClient
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
 from schemas import UserID, UserMessage, SystemMessage, MessageHistory, Response
+from storage import get_client, get_messages, add_message
 from llm import get_llm_response
 
 
@@ -16,33 +17,6 @@ load_dotenv()
 app = FastAPI()
 app.title = "Moody LLM"
 app.description = "A LLM whose mood keeps changing."
-
-
-async def get_redis():
-    host = os.getenv("REDIS_HOST")
-    port = os.getenv("REDIS_PORT")
-    password = os.getenv("REDIS_PASSWORD")
-
-    if not host or not port or not password:
-        raise redis.AuthenticationError("Redis credentials were not provided")
-
-    r = await redis.Redis(
-        host=host,
-        port=int(port),
-        password=password,
-        decode_responses=True
-    )
-    try:
-        yield r
-    except redis.RedisError as _:
-        await r.close()
-
-
-async def get_chat_history(_redis: redis.Redis, user_id: str) -> list:
-    history = await _redis.get(str(user_id))
-    if not history:
-        history = []
-    return history
 
 
 @app.get(path="/api/user_id/", response_model=Response, status_code=status.HTTP_200_OK)
@@ -54,8 +28,8 @@ async def get_user_id():
 
 
 @app.get(path="/api/history/{user_id}/", response_model=Response, status_code=status.HTTP_200_OK)
-async def get_user_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis)], user_id: uuid.UUID):
-    history: list = await get_chat_history(_redis, str(user_id))
+async def get_user_chat_history(client: Annotated[AClient, Depends(get_client)], user_id: uuid.UUID):
+    history: list = await get_messages(client, user_id)
     response = []
 
     for _history in history:
@@ -78,7 +52,7 @@ async def get_user_chat_history(_redis: Annotated[redis.Redis, Depends(get_redis
 
 
 @app.websocket(path="/chat/{user_id}/")
-async def chat(websocket: WebSocket, user_id: uuid.UUID, _redis: Annotated[redis.Redis, Depends(get_redis)]):
+async def chat(websocket: WebSocket, user_id: uuid.UUID, client: Annotated[AClient, Depends(get_client)]):
     await websocket.accept()
     try:
         while True:
@@ -92,10 +66,10 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, _redis: Annotated[redis
                 "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
             })
 
-            history: list = await get_chat_history(_redis, str(user_id))
+            history: list = await get_messages(client, user_id, limit=25)
 
             system_message: dict[str, Any] = await get_llm_response(history,
-                                                              user_message["message"])
+                                                                    user_message["message"])
 
             system_message.update({
                 "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
@@ -106,9 +80,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, _redis: Annotated[redis
                 "system": system_message
             }
 
-            history.append(message)
-            await _redis.set(str(user_id), history)
-
+            await add_message(client, user_id, message)
             await websocket.send_json(data=system_message)
     except WebSocketDisconnect:
         await websocket.close()
