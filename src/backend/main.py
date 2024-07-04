@@ -1,10 +1,9 @@
 import uuid
 import datetime
-import traceback
 from typing import Annotated, Any
 
 from dotenv import dotenv_values
-from supabase import AClient, acreate_client
+from supabase import acreate_client
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
 from storage import Storage
@@ -32,7 +31,6 @@ async def get_storage():
         yield storage
     except Exception as e:
         print(e)
-
 
 
 @app.get(path="/api/user_id/", response_model=Response, status_code=status.HTTP_200_OK)
@@ -85,7 +83,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Stor
             history: list = await storage.get_messages(user_id, limit=25)
 
             ai_message: dict[str, Any] = await get_llm_response(history,
-                                                                    user_message["message"])
+                                                                user_message["message"])
 
             ai_message.update({
                 "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
