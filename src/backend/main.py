@@ -6,7 +6,7 @@ from dotenv import dotenv_values
 from supabase import acreate_client
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
-from storage import Storage
+from storage import Storage, StorageException
 from llm import get_llm_response
 from schemas import UserID, Response, UserMessage, AIMessage, MessageHistory
 
@@ -29,7 +29,7 @@ async def get_storage():
     storage = Storage(client=client, table=table)
     try:
         yield storage
-    except Exception as e:
+    except StorageException as e:
         print(e)
 
 

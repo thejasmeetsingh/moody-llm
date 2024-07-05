@@ -24,3 +24,7 @@ class Storage:
             "user_id": str(user_id),
             "message": message
         }).execute()
+
+
+class StorageException(Exception):
+    pass
