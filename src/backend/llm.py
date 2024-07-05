@@ -5,8 +5,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from utils import markdown_to_html
-
 
 llm = ChatOllama(model="llama3")
 
@@ -57,6 +55,6 @@ async def get_llm_response(history: list, _user_message: str) -> dict[str, str]:
     )
 
     return {
-        "message": markdown_to_html(response),
+        "message": response,
         "mood": key
     }

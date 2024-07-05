@@ -6,8 +6,9 @@ from dotenv import dotenv_values
 from supabase import acreate_client
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
 
-from storage import Storage, StorageException
 from llm import get_llm_response
+from utils import markdown_to_html
+from storage import Storage, StorageException
 from schemas import UserID, Response, UserMessage, AIMessage, MessageHistory
 
 app = FastAPI()
@@ -56,7 +57,7 @@ async def get_user_chat_history(storage: Annotated[Storage, Depends(get_storage)
                 timestamp=_user["timestamp"]
             ),
             ai=AIMessage(
-                message=_ai["message"],
+                message=markdown_to_html(_ai["message"]),
                 timestamp=_ai["timestamp"],
                 mood=_ai["mood"]
             )
@@ -96,6 +97,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Stor
 
             await storage.add_message(user_id, message)
 
+            ai_message["message"] = markdown_to_html(ai_message["message"])
             await websocket.send_json(data=ai_message)
     except WebSocketDisconnect:
         await websocket.close()
