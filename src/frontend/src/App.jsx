@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import hljs from "highlight.js";
 import DisplayMessages from "./components/DisplayMessages";
 import SendMessage from "./components/SendMessage";
+import useMessagesContext from "./hooks/use-messages-context";
 
 function App() {
+  const { fetchMessages } = useMessagesContext();
+
   useEffect(() => {
-    hljs.highlightAll();
+    fetchMessages();
   }, []);
 
   return (
