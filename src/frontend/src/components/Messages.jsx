@@ -1,9 +1,9 @@
 import { useRef, useEffect } from "react";
-import DisplaySentMessage from "./DisplaySentMessage";
-import DisplayReceivedMessage from "./DisplayReceivedMessage";
+import SentMessage from "./SentMessage";
+import DisplayReceivedMessage from "./ReceivedMessage";
 import useMessagesContext from "../hooks/use-messages-context";
 
-export default function DisplayMessages() {
+export default function Messages() {
   const { messages } = useMessagesContext();
   const messagesEndRef = useRef(null);
 
@@ -13,9 +13,7 @@ export default function DisplayMessages() {
     );
 
     if (message.is_user) {
-      messageComponent = (
-        <DisplaySentMessage key={index} message={message.message} />
-      );
+      messageComponent = <SentMessage key={index} message={message.message} />;
     }
 
     return messageComponent;

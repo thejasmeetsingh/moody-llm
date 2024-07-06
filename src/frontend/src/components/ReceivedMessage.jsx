@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import DOMPurify from "dompurify";
 import hljs from "highlight.js";
+import Timestamp from "./Timestamp";
 
-export default function DisplaySentMessage({ message }) {
+export default function ReceivedMessage({ message }) {
   const sanitizedHTML = DOMPurify.sanitize(message.content);
 
   useEffect(() => {
@@ -15,6 +16,7 @@ export default function DisplaySentMessage({ message }) {
         className="text-sm"
         dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
       />
+      <Timestamp timestamp={message.timestamp} />
     </div>
   );
 }

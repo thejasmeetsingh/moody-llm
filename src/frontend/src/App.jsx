@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import DisplayMessages from "./components/DisplayMessages";
+import Messages from "./components/Messages";
 import SendMessage from "./components/SendMessage";
 import useMessagesContext from "./hooks/use-messages-context";
 
@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen">
-      <DisplayMessages />
+      <Messages />
       <SendMessage />
     </div>
   );
