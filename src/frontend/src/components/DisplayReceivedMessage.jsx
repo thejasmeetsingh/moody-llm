@@ -1,7 +1,14 @@
+import DOMPurify from "dompurify";
+
 export default function DisplaySentMessage({ message }) {
+  const sanitizedHTML = DOMPurify.sanitize(message.message);
+
   return (
     <div className="mb-4 self-center p-4 max-w-xs">
-      <div className="text-sm">{message.message}</div>
+      <div
+        className="text-sm"
+        dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+      />
     </div>
   );
 }
