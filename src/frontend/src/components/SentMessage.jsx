@@ -1,12 +1,14 @@
 import Timestamp from "./Timestamp";
 
-export default function SentMessage({ message }) {
+export default function SentMessage({ content, timestamp }) {
   return (
-    <div className="mb-4 self-end max-w-xs">
-      <div className="text-sm bg-blue-200 p-4 rounded-lg">
-        {message.content}
+    <div className="mb-6 flex justify-end">
+      <div className="max-w-xs">
+        <div className="p-4 rounded-lg bg-blue-200 text-sm">{content}</div>
+        <div className="text-right">
+          <Timestamp timestamp={timestamp} />
+        </div>
       </div>
-      <Timestamp timestamp={message.timestamp} />
     </div>
   );
 }

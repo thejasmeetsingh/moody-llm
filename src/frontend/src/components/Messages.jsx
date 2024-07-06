@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import SentMessage from "./SentMessage";
-import DisplayReceivedMessage from "./ReceivedMessage";
+import ReceivedMessage from "./ReceivedMessage";
 import useMessagesContext from "../hooks/use-messages-context";
 
 export default function Messages() {
@@ -8,12 +8,10 @@ export default function Messages() {
   const messagesEndRef = useRef(null);
 
   const content = messages.map((message, index) => {
-    let messageComponent = (
-      <DisplayReceivedMessage key={index} message={message.message} />
-    );
+    let messageComponent = <ReceivedMessage key={index} {...message.message} />;
 
     if (message.is_user) {
-      messageComponent = <SentMessage key={index} message={message.message} />;
+      messageComponent = <SentMessage key={index} {...message.message} />;
     }
 
     return messageComponent;
@@ -24,7 +22,7 @@ export default function Messages() {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+    <div className="flex-1 overflow-y-auto p-4">
       {content}
       <div ref={messagesEndRef} />
     </div>

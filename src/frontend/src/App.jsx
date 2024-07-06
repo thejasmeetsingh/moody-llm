@@ -11,9 +11,11 @@ function App() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen">
-      <Messages />
-      <SendMessage />
+    <div className="container mx-auto">
+      <div className="flex flex-col h-screen">
+        <Messages />
+        <SendMessage />
+      </div>
     </div>
   );
 }

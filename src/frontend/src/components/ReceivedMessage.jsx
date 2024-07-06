@@ -3,20 +3,22 @@ import DOMPurify from "dompurify";
 import hljs from "highlight.js";
 import Timestamp from "./Timestamp";
 
-export default function ReceivedMessage({ message }) {
-  const sanitizedHTML = DOMPurify.sanitize(message.content);
+export default function ReceivedMessage({ content, mood, timestamp }) {
+  const sanitizedHTML = DOMPurify.sanitize(content);
 
   useEffect(() => {
     hljs.highlightAll();
   });
 
   return (
-    <div className="mb-4 self-center p-4 max-w-xs">
-      <div
-        className="text-sm"
-        dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
-      />
-      <Timestamp timestamp={message.timestamp} />
+    <div className="mb-6 flex justify-center">
+      <div className="w-full max-w-lg">
+        <div
+          className="text-sm"
+          dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+        />
+        <Timestamp timestamp={timestamp} />
+      </div>
     </div>
   );
 }

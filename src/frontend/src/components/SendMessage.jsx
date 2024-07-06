@@ -19,11 +19,11 @@ export default function SendMessage() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type message here..."
-          className="flex-1 p-2 border border-gray-300 rounded mr-4"
+          className="flex-1 p-4 border border-gray-300 drop-shadow-lg shadow-grey-500 rounded-lg mr-4"
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          className="px-4 py-2 bg-blue-500 text-white shadow-md shadow-blue-500 rounded-lg"
         >
           Send
         </button>
