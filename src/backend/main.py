@@ -51,17 +51,24 @@ async def get_user_chat_history(storage: Annotated[Storage, Depends(get_storage)
         _user: dict[str, str] = message["message"]["user"]
         _ai: dict[str, str] = message["message"]["ai"]
 
-        response.append(MessageHistory(
-            user=UserMessage(
-                message=_user["message"],
+        user_message = MessageHistory(
+            message=UserMessage(
+                content=_user["content"],
                 timestamp=_user["timestamp"]
             ),
-            ai=AIMessage(
-                message=markdown_to_html(_ai["message"]),
-                timestamp=_ai["timestamp"],
-                mood=_ai["mood"]
-            )
-        ))
+            is_user=True
+        )
+
+        ai_message = MessageHistory(
+            message=AIMessage(
+                content=markdown_to_html(_ai["content"]),
+                mood=_ai["mood"],
+                timestamp=_ai["timestamp"]
+            ),
+            is_user=False
+        )
+
+        response.extend([user_message, ai_message])
 
     return Response(message="Message History", data=response)
 
@@ -73,7 +80,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Stor
         while True:
             user_message: dict[str, Any] = await websocket.receive_json()
 
-            if not user_message.get("message"):
+            if not user_message.get("content"):
                 await websocket.send_denial_response()
                 break
 
@@ -84,7 +91,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Stor
             history: list = await storage.get_messages(user_id, limit=25)
 
             ai_message: dict[str, Any] = await get_llm_response(history,
-                                                                user_message["message"])
+                                                                user_message["content"])
 
             ai_message.update({
                 "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
@@ -97,7 +104,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Stor
 
             await storage.add_message(user_id, message)
 
-            ai_message["message"] = markdown_to_html(ai_message["message"])
+            ai_message["message"] = markdown_to_html(ai_message["content"])
             await websocket.send_json(data=ai_message)
     except WebSocketDisconnect:
         await websocket.close()

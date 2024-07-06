@@ -6,19 +6,19 @@ class UserID(BaseModel):
 
 
 class UserMessage(BaseModel):
-    message: str = Field(max_length=2000)
+    content: str = Field(max_length=2000)
     timestamp: str
 
 
 class AIMessage(BaseModel):
-    message: str
+    content: str
     mood: int
     timestamp: str
 
 
 class MessageHistory(BaseModel):
-    user: UserMessage
-    ai: AIMessage
+    message: UserMessage | AIMessage
+    is_user: bool
 
 
 class Response(BaseModel):

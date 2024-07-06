@@ -55,6 +55,6 @@ async def get_llm_response(history: list, _user_message: str) -> dict[str, str]:
     )
 
     return {
-        "message": response,
+        "content": response,
         "mood": key
     }
