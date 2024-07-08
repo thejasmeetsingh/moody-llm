@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
 import useMessagesContext from "../hooks/use-messages-context";
