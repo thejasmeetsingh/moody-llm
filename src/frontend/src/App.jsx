@@ -4,10 +4,10 @@ import SendMessage from "./components/SendMessage";
 import useMessagesContext from "./hooks/use-messages-context";
 
 function App() {
-  const { fetchMessages } = useMessagesContext();
+  const { fetchAndSetUserID } = useMessagesContext();
 
   useEffect(() => {
-    fetchMessages();
+    fetchAndSetUserID();
   }, []);
 
   return (
