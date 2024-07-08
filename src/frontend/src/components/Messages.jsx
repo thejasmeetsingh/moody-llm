@@ -4,8 +4,7 @@ import ReceivedMessage from "./ReceivedMessage";
 import useMessagesContext from "../hooks/use-messages-context";
 
 export default function Messages() {
-  const { messages } = useMessagesContext();
-  const messagesEndRef = useRef(null);
+  const { messages, messagesEndRef, scrollToBottom } = useMessagesContext();
 
   const content = messages.map((message, index) => {
     let messageComponent = <ReceivedMessage key={index} {...message.message} />;
@@ -18,7 +17,7 @@ export default function Messages() {
   });
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
   }, [messages]);
 
   return (

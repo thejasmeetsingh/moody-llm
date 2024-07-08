@@ -3,17 +3,16 @@ import useMessagesContext from "../hooks/use-messages-context";
 
 export default function SendMessage() {
   const [message, setMessage] = useState("");
-  const [inputDisabled, setInputDisabled] = useState(false);
-  const { sendMessage } = useMessagesContext();
+  const { sendMessage, messageInputDisabled, toggleMessageInput } =
+    useMessagesContext();
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
-    setInputDisabled(true);
+    toggleMessageInput(!messageInputDisabled);
 
     await sendMessage(message);
 
     setMessage("");
-    setInputDisabled(false);
   };
 
   return (
@@ -28,7 +27,7 @@ export default function SendMessage() {
               type="text"
               value={message}
               maxLength={2000}
-              disabled={inputDisabled}
+              disabled={messageInputDisabled}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Type message here..."
               className="w-full p-4 border border-gray-300 drop-shadow-lg shadow-grey-500 rounded-lg"
@@ -39,7 +38,7 @@ export default function SendMessage() {
           </div>
           <button
             type="submit"
-            disabled={inputDisabled}
+            disabled={messageInputDisabled}
             className="ml-4 p-4 bg-blue-500 text-white shadow-md shadow-blue-500 rounded-lg"
           >
             Send
