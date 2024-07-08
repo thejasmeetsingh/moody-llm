@@ -5,6 +5,7 @@ from typing import Annotated, Any
 from dotenv import dotenv_values
 from supabase import acreate_client
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, status
+from fastapi.middleware.cors import CORSMiddleware
 
 from llm import get_llm_response
 from utils import markdown_to_html
@@ -14,6 +15,13 @@ from schemas import UserID, Response, UserMessage, AIMessage, MessageHistory
 app = FastAPI()
 app.title = "Moody LLM"
 app.description = "A LLM whose mood keeps changing."
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 
 async def get_storage():
