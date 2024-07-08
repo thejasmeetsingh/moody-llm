@@ -1,21 +1,21 @@
-import { useEffect } from "react";
 import DOMPurify from "dompurify";
-import hljs from "highlight.js";
 import Timestamp from "./Timestamp";
+import TypingEffect from "./TypingEffect";
 
-export default function ReceivedMessage({ content, mood, timestamp }) {
+export default function ReceivedMessage({
+  content,
+  mood,
+  timestamp,
+  addTypingEffect,
+}) {
   const sanitizedHTML = DOMPurify.sanitize(content);
-
-  useEffect(() => {
-    hljs.highlightAll();
-  });
 
   return (
     <div className="mb-6 flex justify-center">
-      <div className="w-full max-w-lg">
-        <div
-          className="text-sm"
-          dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+      <div className="w-full max-w-lg break-words text-sm">
+        <TypingEffect
+          htmlString={sanitizedHTML}
+          speed={addTypingEffect ? 10 : 0}
         />
         <Timestamp timestamp={timestamp} />
       </div>

@@ -139,17 +139,31 @@ function Provider({ children }) {
     ]);
   });
 
+  const addMessage = (message) => {
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
+
   const sendMessage = async (content) => {
-    setMessages([
-      ...messages,
-      {
-        message: {
-          content,
-          timestamp: "2024-07-05T06:27:36.677157+00:00",
-        },
-        is_user: true,
+    addMessage({
+      message: {
+        content,
+        timestamp: "2024-07-05T06:27:36.677157+00:00",
       },
-    ]);
+      is_user: true,
+    });
+
+    setTimeout(() => {
+      addMessage({
+        message: {
+          content:
+            '<em>peeks out from behind a curtain</em> O-oh, okay! I&#x27;ll try my bestest to write those codes for you! <em>scurries out to get papers and pens</em><br><br>Here are the Fibonacci sequences in each of the requested languages:<br><br><em></em>Java<em></em><br><pre><code class="language-java">public class Fibonacci {\n    public static int fibonacci(int n) {\n        if (n &lt;= 0) return -1;\n        else if (n == 1) return 0;\n        else if (n == 2) return 1;\n        else {\n            int a = 0, b = 1, result = 0;\n            for (int i = 3; i &lt;= n; i++) {\n                result = a + b;\n                a = b;\n                b = result;\n            }\n            return result;\n        }\n    }\n\n    public static void main(String[] args) {\n        System.out.println(fibonacci(10));\n    }\n}\n</code></pre><br><br><em></em>JavaScript<em></em><br><pre><code class="language-javascript">function fibonacci(n) {\n  if (n &lt;= 0) return -1;\n  else if (n == 1) return 0;\n  else if (n == 2) return 1;\n  else {\n    let a = 0, b = 1, result = 0;\n    for (let i = 3; i &lt;= n; i++) {\n      result = a + b;\n      a = b;\n      b = result;\n    }\n    return result;\n  }\n}\n\nconsole.log(fibonacci(10));\n</code></pre><br><br><em></em>C++<em></em><br><pre><code class="language-c">#include &lt;iostream&gt;\n\nint fibonacci(int n) {\n  if (n &lt;= 0) return -1;\n  else if (n == 1) return 0;\n  else if (n == 2) return 1;\n  else {\n    int a = 0, b = 1, result = 0;\n    for (int i = 3; i &lt;= n; i++) {\n      result = a + b;\n      a = b;\n      b = result;\n    }\n    return result;\n  }\n}\n\nint main() {\n  std::cout &lt;&lt; fibonacci(10) &lt;&lt; std::endl;\n  return 0;\n}\n</code></pre><br><br><em></em>Go<em></em><br><pre><code class="language-go">package main\n\nimport &quot;fmt&quot;\n\nfunc fibonacci(n int) int {\n  if n &lt;= 0 {\n    return -1\n  } else if n == 1 {\n    return 0\n  } else if n == 2 {\n    return 1\n  } else {\n    a, b := 0, 1\n    result := 0\n    for i := 3; i &lt;= n; i++ {\n      result = a + b\n      a, b = b, result\n    }\n    return result\n  }\n}\n\nfunc main() {\n  fmt.Println(fibonacci(10))\n}\n</code></pre><br><br>P-p-please forgive me if these codes are not perfect... I&#x27;m still learning and my mood is all over the place!',
+          mood: 5,
+          timestamp: "2024-07-05T06:25:52.700134+00:00",
+          addTypingEffect: true,
+        },
+        is_user: false,
+      });
+    }, 5000);
   };
 
   return (

@@ -6,15 +6,14 @@ export default function SendMessage() {
   const [inputDisabled, setInputDisabled] = useState(false);
   const { sendMessage } = useMessagesContext();
 
-  const onFormSubmit = (e) => {
+  const onFormSubmit = async (e) => {
     e.preventDefault();
     setInputDisabled(true);
 
-    setTimeout(async () => {
-      await sendMessage(message);
-      setMessage("");
-      setInputDisabled(false);
-    });
+    await sendMessage(message);
+
+    setMessage("");
+    setInputDisabled(false);
   };
 
   return (
