@@ -11,19 +11,30 @@ export default function ReceivedMessage({
   addTypingEffect,
 }) {
   const sanitizedHTML = DOMPurify.sanitize(content);
+  const moodToCSS = {
+    1: "angry",
+    2: "sad",
+    3: "happy",
+    4: "sarcastic",
+    5: "fearful",
+  };
 
   useEffect(() => {
-    hljs.highlightAll();
+    hljs.highlightAll(); // Highlight existing code snippets
   }, []);
 
   return (
-    <div className="mb-6 flex justify-center">
-      <div className="w-full max-w-lg break-words text-sm">
-        {addTypingEffect ? (
-          <TypingEffect htmlString={sanitizedHTML} speed={10} />
-        ) : (
-          <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
-        )}
+    <div className="mb-6 flex justify-left">
+      <div className="w-full max-w-lg">
+        <div
+          className={`p-2 rounded-lg break-words text-sm mood-${moodToCSS[mood]}`}
+        >
+          {addTypingEffect ? (
+            <TypingEffect htmlString={sanitizedHTML} speed={10} />
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+          )}
+        </div>
         <Timestamp timestamp={timestamp} />
       </div>
     </div>

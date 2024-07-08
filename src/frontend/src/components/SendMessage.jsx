@@ -8,7 +8,7 @@ export default function SendMessage() {
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
-    toggleMessageInput(!messageInputDisabled);
+    toggleMessageInput(true);
 
     await sendMessage(message);
 
@@ -27,6 +27,7 @@ export default function SendMessage() {
               type="text"
               value={message}
               maxLength={2000}
+              autoFocus={true}
               disabled={messageInputDisabled}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Type message here..."

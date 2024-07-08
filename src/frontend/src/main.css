@@ -77,3 +77,28 @@
 .hljs-link {
   text-decoration: underline;
 }
+
+.mood-angry {
+  background: linear-gradient(135deg, #ffcccc, #ff6666);
+  color: black;
+}
+
+.mood-sad {
+  background: linear-gradient(135deg, #cceeff, #6699cc);
+  color: black;
+}
+
+.mood-happy {
+  background: linear-gradient(135deg, #ffffcc, #ffcc99);
+  color: black;
+}
+
+.mood-sarcastic {
+  background: linear-gradient(135deg, #e0e0e0, #d3b8e6);
+  color: black;
+}
+
+.mood-fearful {
+  background: linear-gradient(135deg, #f0f0f0, #ac66ed);
+  color: black;
+}

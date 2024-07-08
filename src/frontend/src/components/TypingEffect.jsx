@@ -3,13 +3,13 @@ import hljs from "highlight.js";
 import useMessagesContext from "../hooks/use-messages-context";
 
 export default function TypingEffect({ htmlString, speed }) {
-  const { scrollToBottom, messageInputDisabled, toggleMessageInput } =
-    useMessagesContext();
+  const { scrollToBottom, toggleMessageInput } = useMessagesContext();
   const [displayText, setDisplayText] = useState("");
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (index < htmlString.length) {
+      // Custom Typing Effect
       const timeout = setTimeout(() => {
         setDisplayText((prevText) => prevText + htmlString[index]);
         setIndex(index + 1);
@@ -20,8 +20,8 @@ export default function TypingEffect({ htmlString, speed }) {
       return () => clearTimeout(timeout);
     }
 
-    hljs.highlightAll();
-    toggleMessageInput(!messageInputDisabled);
+    hljs.highlightAll(); // Highligh the code snippet once the typing effect is completed
+    toggleMessageInput(false);
     scrollToBottom("auto");
   }, [index, htmlString, speed]);
 
