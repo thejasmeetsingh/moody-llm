@@ -7,13 +7,13 @@ class UserID(BaseModel):
 
 class UserMessage(BaseModel):
     content: str = Field(max_length=2000)
-    timestamp: str
+    timestamp: int
 
 
 class AIMessage(BaseModel):
     content: str
     mood: int
-    timestamp: str
+    timestamp: int
 
 
 class MessageHistory(BaseModel):

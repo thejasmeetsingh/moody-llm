@@ -17,7 +17,7 @@ app.title = "Moody LLM"
 app.description = "A LLM whose mood keeps changing."
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -92,17 +92,13 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Stor
                 await websocket.send_denial_response()
                 break
 
-            user_message.update({
-                "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
-            })
-
             history: list = await storage.get_messages(user_id, limit=25)
 
             ai_message: dict[str, Any] = await get_llm_response(history,
                                                                 user_message["content"])
 
             ai_message.update({
-                "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
+                "timestamp": round(datetime.datetime.now(datetime.UTC).timestamp())
             })
 
             message = {
@@ -112,7 +108,7 @@ async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Stor
 
             await storage.add_message(user_id, message)
 
-            ai_message["message"] = markdown_to_html(ai_message["content"])
+            ai_message["content"] = markdown_to_html(ai_message["content"])
             await websocket.send_json(data=ai_message)
     except WebSocketDisconnect:
         await websocket.close()

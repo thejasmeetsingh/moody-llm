@@ -33,8 +33,8 @@ def templatize_message_history(history: list) -> list:
 
     for _history in reversed(history):
         messages.extend([
-            HumanMessage(content=_history["message"]["user"]["message"]),
-            AIMessage(content=_history["message"]["ai"]["message"])
+            HumanMessage(content=_history["message"]["user"]["content"]),
+            AIMessage(content=_history["message"]["ai"]["content"])
         ])
 
     return messages

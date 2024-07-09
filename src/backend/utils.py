@@ -18,7 +18,7 @@ def markdown_to_html(markdown):
     markdown = escape_html(markdown)
 
     # Replace single star (*) with <i> tags
-    markdown = re.sub(r'\*(.*?)\*', r'<em>\1</em>', markdown)
+    markdown = re.sub(r'\*(.*?)\*', r'<b><em>\1</em></b>', markdown)
 
     # Replace double star (**) with <b> tags
     markdown = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', markdown)
