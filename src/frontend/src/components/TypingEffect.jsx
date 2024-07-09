@@ -21,7 +21,7 @@ export default function TypingEffect({ htmlString, speed }) {
     }
 
     hljs.highlightAll(); // Highligh the code snippet once the typing effect is completed
-    toggleMessageInput(false);
+    toggleMessageInput();
     scrollToBottom("auto");
   }, [index, htmlString, speed]);
 

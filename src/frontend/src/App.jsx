@@ -4,11 +4,12 @@ import SendMessage from "./components/SendMessage";
 import useMessagesContext from "./hooks/use-messages-context";
 
 function App() {
-  const { fetchAndSetUserID } = useMessagesContext();
+  const { userID, fetchAndSetUserID, fetchMessages } = useMessagesContext();
 
   useEffect(() => {
     fetchAndSetUserID();
-  }, []);
+    fetchMessages();
+  }, [userID]);
 
   return (
     <div className="container mx-auto">

@@ -8,7 +8,7 @@ export default function SendMessage() {
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
-    toggleMessageInput(true);
+    toggleMessageInput();
 
     await sendMessage(message);
 
