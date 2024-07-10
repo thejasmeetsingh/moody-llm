@@ -13,7 +13,6 @@ export default function TypingEffect({ htmlString, speed }) {
       const timeout = setTimeout(() => {
         setDisplayText((prevText) => prevText + htmlString[index]);
         setIndex(index + 1);
-
         scrollToBottom("auto");
       }, speed);
 

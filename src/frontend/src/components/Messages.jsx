@@ -21,7 +21,7 @@ export default function Messages() {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4">
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse">
       {content}
       <div ref={messagesEndRef} />
     </div>

@@ -11,6 +11,18 @@ function Provider({ children }) {
   const apiBaseURL = import.meta.env.VITE_API_BASE_URL;
   const wsBaseURL = import.meta.env.VITE_WS_BASE_URL;
 
+  const scrollToBottom = (behavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  };
+
+  const toggleMessageInput = () => {
+    setMessageInputDisabled(!messageInputDisabled);
+  };
+
+  const addMessage = (message) => {
+    setMessages((prevMessages) => [message, ...prevMessages]);
+  };
+
   const fetchAndSetUserID = useCallback(async () => {
     let _userID = sessionStorage.getItem("userID");
 
@@ -29,8 +41,8 @@ function Provider({ children }) {
       }
     }
 
-    setUserID(_userID);
-  }, [setUserID, userID]);
+    setUserID((_) => _userID);
+  }, [userID]);
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -45,18 +57,6 @@ function Provider({ children }) {
       console.log("Error while fetching messages: ", error);
     }
   }, [userID]);
-
-  const scrollToBottom = (behavior = "smooth") => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
-  };
-
-  const toggleMessageInput = () => {
-    setMessageInputDisabled(!messageInputDisabled);
-  };
-
-  const addMessage = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-  };
 
   const sendMessage = async (content) => {
     const socket = new WebSocket(`${wsBaseURL}/${userID}/`);
@@ -76,9 +76,8 @@ function Provider({ children }) {
 
     socket.addEventListener("message", (event) => {
       addMessage({
-        message: JSON.parse(event.data),
+        message: { ...JSON.parse(event.data), addTypingEffect: true },
         is_user: false,
-        addTypingEffect: true,
       });
     });
 
