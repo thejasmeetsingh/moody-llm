@@ -79,8 +79,6 @@ function Provider({ children }) {
         message: JSON.parse(event.data),
         is_user: false,
       });
-
-      toggleEnableTypingEffect();
     });
 
     socket.addEventListener("error", (event) => {
