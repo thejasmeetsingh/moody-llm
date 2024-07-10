@@ -4,11 +4,16 @@ import ReceivedMessage from "./ReceivedMessage";
 import useMessagesContext from "../hooks/use-messages-context";
 
 export default function Messages() {
-  const { messages, messagesEndRef, scrollToBottom } = useMessagesContext();
+  const { messages, messagesEndRef, messageInputDisabled, scrollToBottom } =
+    useMessagesContext();
 
   const content = messages.map((message, index) => {
     let messageComponent = (
-      <ReceivedMessage key={index} idx={index} {...message.message} />
+      <ReceivedMessage
+        key={index}
+        addTypingEffect={messageInputDisabled && index === 0}
+        {...message.message}
+      />
     );
 
     if (message.is_user) {

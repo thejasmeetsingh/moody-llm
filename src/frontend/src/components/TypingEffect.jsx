@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import hljs from "highlight.js";
 import useMessagesContext from "../hooks/use-messages-context";
 
-export default function TypingEffect({ idx, htmlString, speed }) {
-  const { scrollToBottom, toggleMessageInput, disableTypingEffect } =
-    useMessagesContext();
+export default function TypingEffect({ htmlString, speed }) {
+  const { scrollToBottom, toggleMessageInput } = useMessagesContext();
   const [displayText, setDisplayText] = useState("");
   const [index, setIndex] = useState(0);
 
@@ -22,7 +21,6 @@ export default function TypingEffect({ idx, htmlString, speed }) {
 
     hljs.highlightAll(); // Highligh the code snippet once the typing effect is completed
     toggleMessageInput(); // Enable message input field.
-    disableTypingEffect(idx); // Disable typingEffect for current message.
     scrollToBottom("auto"); // Scroll the control to bottom.
   }, [index, htmlString, speed]);
 

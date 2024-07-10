@@ -23,12 +23,6 @@ function Provider({ children }) {
     setMessages((prevMessages) => [message, ...prevMessages]);
   };
 
-  const disableTypingEffect = (idx) => {
-    const tempMessages = [...messages];
-    tempMessages[idx].message.addTypingEffect = false;
-    setMessages(tempMessages);
-  };
-
   const fetchAndSetUserID = useCallback(async () => {
     let _userID = sessionStorage.getItem("userID");
 
@@ -82,9 +76,11 @@ function Provider({ children }) {
 
     socket.addEventListener("message", (event) => {
       addMessage({
-        message: { ...JSON.parse(event.data), addTypingEffect: true },
+        message: JSON.parse(event.data),
         is_user: false,
       });
+
+      toggleEnableTypingEffect();
     });
 
     socket.addEventListener("error", (event) => {
@@ -99,10 +95,9 @@ function Provider({ children }) {
         messages,
         messagesEndRef,
         messageInputDisabled,
-        fetchAndSetUserID,
         scrollToBottom,
         toggleMessageInput,
-        disableTypingEffect,
+        fetchAndSetUserID,
         fetchMessages,
         sendMessage,
       }}
