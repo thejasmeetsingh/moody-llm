@@ -16,7 +16,7 @@ class Storage:
         if limit is not None:
             query = query.limit(limit)
 
-        response = await query.order("created_at").execute()
+        response = await query.order("created_at", desc=True).execute()
         return response.data
 
     async def add_message(self, user_id: uuid.UUID, message: dict):

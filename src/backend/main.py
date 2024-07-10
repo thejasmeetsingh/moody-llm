@@ -76,7 +76,7 @@ async def get_user_chat_history(storage: Annotated[Storage, Depends(get_storage)
             is_user=False
         )
 
-        response.extend([user_message, ai_message])
+        response.extend([ai_message, user_message])
 
     return Response(message="Message History", data=response)
 
