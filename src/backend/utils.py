@@ -2,7 +2,10 @@ import re
 
 
 def escape_html(text):
-    """Escape HTML special characters in the given text."""
+    """
+    Escape HTML special characters in the given text.
+    """
+
     html_escape_table = {
         "&": "&amp;",
         '"': "&quot;",
@@ -14,6 +17,10 @@ def escape_html(text):
 
 
 def markdown_to_html(markdown):
+    """
+    Convert markdown text (which is returned by the LLM) to HTML
+    """
+
     # Escape HTML special characters
     markdown = escape_html(markdown)
 
@@ -34,8 +41,6 @@ def markdown_to_html(markdown):
     # Replace single backtick (`) with <code> tags
     markdown = re.sub(r'`([^`]*)`', r'<code>\1</code>', markdown)
 
-    # # Replace new line characters with <br> tags
-    # markdown = markdown.replace('\n', '<br>')
     # Replace new line characters with <br> tags, but not inside <pre><code> blocks
     parts = re.split(r'(<pre><code.*?>.*?</code></pre>)',
                      markdown, flags=re.DOTALL)

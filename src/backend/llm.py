@@ -8,7 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 llm = ChatOllama(model="llama3")
 
-
+# Set base chat prompt for LLM
 prompt = ChatPromptTemplate.from_messages([
     (
         "system",
@@ -19,6 +19,7 @@ prompt = ChatPromptTemplate.from_messages([
 
 chain = prompt | llm | StrOutputParser()
 
+# Pre-defined moods
 moods: dict[int, str] = {
     1: "Angry",
     2: "Sad",
@@ -29,6 +30,10 @@ moods: dict[int, str] = {
 
 
 def templatize_message_history(history: list) -> list:
+    """
+    Given chat message history in JSON or dict. Transform them to langchain message objects.
+    """
+
     messages: list[HumanMessage | AIMessage] = []
 
     for _history in reversed(history):
@@ -41,10 +46,18 @@ def templatize_message_history(history: list) -> list:
 
 
 def generate_random_mood() -> int:
+    """
+    Generate random number which helps to feed a different mood (probably) to the LLM
+    """
+
     return random.randrange(1, len(moods) + 1)
 
 
 async def get_llm_response(history: list, _user_message: str) -> dict[str, str]:
+    """
+    Generate LLM response based on chat message history and user current message.
+    """
+
     messages: list = templatize_message_history(history)
     key: int = generate_random_mood()
 

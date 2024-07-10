@@ -25,6 +25,10 @@ app.add_middleware(
 
 
 async def get_storage():
+    """
+    Create storage instance with supabase async client
+    """
+
     config = dotenv_values()
 
     table = config.get("SUPABASE_TABLE_NAME")
@@ -44,6 +48,11 @@ async def get_storage():
 
 @app.get(path="/api/user_id/", response_model=Response, status_code=status.HTTP_200_OK)
 async def get_user_id():
+    """
+    Generate a userID for each request. This userID will be used on frontend to distinguish between
+    different users.
+    """
+
     return Response(
         message="UserID generated successfully",
         data=UserID(user_id=uuid.uuid4())
@@ -52,6 +61,10 @@ async def get_user_id():
 
 @app.get(path="/api/history/{user_id}/", response_model=Response, status_code=status.HTTP_200_OK)
 async def get_user_chat_history(storage: Annotated[Storage, Depends(get_storage)], user_id: uuid.UUID):
+    """
+    Fetch chat message history from storage and format them based on the pydantic schema
+    """
+
     messages: list = await storage.get_messages(user_id)
     response = []
 
@@ -83,11 +96,16 @@ async def get_user_chat_history(storage: Annotated[Storage, Depends(get_storage)
 
 @app.websocket(path="/chat/{user_id}/")
 async def chat(websocket: WebSocket, user_id: uuid.UUID, storage: Annotated[Storage, Depends(get_storage)]):
+    """
+    Interface for allowing bi-direction communication between user and LLM
+    """
+
     await websocket.accept()
     try:
         while True:
             user_message: dict[str, Any] = await websocket.receive_json()
 
+            # Reject the message if content key is not present in the payload
             if not user_message.get("content"):
                 await websocket.send_denial_response()
                 break
