@@ -7,7 +7,9 @@ export default function Messages() {
   const { messages, messagesEndRef, scrollToBottom } = useMessagesContext();
 
   const content = messages.map((message, index) => {
-    let messageComponent = <ReceivedMessage key={index} {...message.message} />;
+    let messageComponent = (
+      <ReceivedMessage key={index} idx={index} {...message.message} />
+    );
 
     if (message.is_user) {
       messageComponent = <SentMessage key={index} {...message.message} />;
@@ -22,8 +24,8 @@ export default function Messages() {
 
   return (
     <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse">
-      {content}
       <div ref={messagesEndRef} />
+      {content}
     </div>
   );
 }

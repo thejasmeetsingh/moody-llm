@@ -23,6 +23,12 @@ function Provider({ children }) {
     setMessages((prevMessages) => [message, ...prevMessages]);
   };
 
+  const disableTypingEffect = (idx) => {
+    const tempMessages = [...messages];
+    tempMessages[idx].message.addTypingEffect = false;
+    setMessages(tempMessages);
+  };
+
   const fetchAndSetUserID = useCallback(async () => {
     let _userID = sessionStorage.getItem("userID");
 
@@ -96,6 +102,7 @@ function Provider({ children }) {
         fetchAndSetUserID,
         scrollToBottom,
         toggleMessageInput,
+        disableTypingEffect,
         fetchMessages,
         sendMessage,
       }}
