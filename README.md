@@ -32,7 +32,7 @@ The LLM's responses are based on different moods, configured through a `ChatProm
 
 ## Prerequisites:
 
-1. Supabase Account:
+1. [Supabase](https://supabase.com/) Account:
     - Create an account on Supabase and set up a table.
     - Obtain the Supabase Key and Supabase URL from the Supabase dashboard.
     - Configure these details in the backend `.env` file.
