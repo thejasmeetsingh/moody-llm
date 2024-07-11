@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     fetchAndSetUserID();
-  }, [userID]);
+  }, []);
 
   return (
     <div className="container mx-auto">

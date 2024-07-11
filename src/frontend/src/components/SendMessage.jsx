@@ -24,6 +24,7 @@ export default function SendMessage() {
         <div className="flex items-center">
           <div className="relative w-full">
             <input
+              required
               type="text"
               value={message}
               maxLength={2000}

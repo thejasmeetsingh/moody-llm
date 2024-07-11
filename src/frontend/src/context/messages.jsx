@@ -37,17 +37,17 @@ function Provider({ children }) {
         _userID = json.data.user_id;
         sessionStorage.setItem("userID", _userID);
       } catch (error) {
-        console.log("Error while fetching userID: ", error);
+        console.error("Error while fetching userID: ", error);
       }
     }
 
-    setUserID((_) => _userID);
-    await fetchMessages();
+    setUserID(_userID);
+    await fetchMessages(_userID);
   };
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (_userID) => {
     try {
-      const response = await fetch(`${apiBaseURL}/history/${userID}/`);
+      const response = await fetch(`${apiBaseURL}/history/${_userID}/`);
       if (!response.ok) {
         throw new Error("Network error");
       }
@@ -55,7 +55,7 @@ function Provider({ children }) {
       const json = await response.json();
       setMessages(json.data);
     } catch (error) {
-      console.log("Error while fetching messages: ", error);
+      console.error("Error while fetching messages: ", error);
     }
   };
 
@@ -83,7 +83,7 @@ function Provider({ children }) {
     });
 
     socket.addEventListener("error", (event) => {
-      console.log("Websocket error: ", event);
+      console.error("Websocket error: ", event);
     });
   };
 
