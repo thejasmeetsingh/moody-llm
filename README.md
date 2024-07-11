@@ -8,7 +8,7 @@ Moody LLM is an interactive chat application where a Language Model's mood keeps
 
 ## Demo
 
-<video controls src="https://moody-llm.s3.ap-south-1.amazonaws.com/demo.mp4" title="Demo"></video>
+[![](./assets/thumbnail.png)](https://moody-llm.s3.ap-south-1.amazonaws.com/demo.mp4)
 
 ## Getting Started
 
