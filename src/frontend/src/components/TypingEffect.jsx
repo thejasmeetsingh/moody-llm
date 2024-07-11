@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+
 import hljs from "highlight.js";
+
 import useMessagesContext from "../hooks/use-messages-context";
 
 export default function TypingEffect({ htmlString, speed }) {

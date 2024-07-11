@@ -1,6 +1,8 @@
 import { useEffect } from "react";
+
 import DOMPurify from "dompurify";
 import hljs from "highlight.js";
+
 import Timestamp from "./Timestamp";
 import TypingEffect from "./TypingEffect";
 
