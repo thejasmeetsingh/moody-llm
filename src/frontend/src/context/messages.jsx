@@ -23,7 +23,7 @@ function Provider({ children }) {
     setMessages((prevMessages) => [message, ...prevMessages]);
   };
 
-  const fetchAndSetUserID = useCallback(async () => {
+  const fetchAndSetUserID = async () => {
     let _userID = sessionStorage.getItem("userID");
 
     if (!_userID) {
@@ -42,9 +42,10 @@ function Provider({ children }) {
     }
 
     setUserID((_) => _userID);
-  }, [userID]);
+    await fetchMessages();
+  };
 
-  const fetchMessages = useCallback(async () => {
+  const fetchMessages = async () => {
     try {
       const response = await fetch(`${apiBaseURL}/history/${userID}/`);
       if (!response.ok) {
@@ -56,7 +57,7 @@ function Provider({ children }) {
     } catch (error) {
       console.log("Error while fetching messages: ", error);
     }
-  }, [userID]);
+  };
 
   const sendMessage = async (content) => {
     const socket = new WebSocket(`${wsBaseURL}/${userID}/`);
@@ -96,7 +97,6 @@ function Provider({ children }) {
         scrollToBottom,
         toggleMessageInput,
         fetchAndSetUserID,
-        fetchMessages,
         sendMessage,
       }}
     >

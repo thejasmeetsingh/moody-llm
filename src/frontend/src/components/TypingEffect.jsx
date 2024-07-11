@@ -19,8 +19,11 @@ export default function TypingEffect({ htmlString, speed }) {
     }
 
     toggleMessageInput(); // Enable message input field.
-    hljs.highlightAll(); // Highligh the code snippet once the typing effect is completed
-    console.log("child loaded");
+
+    // Highligh the code snippet once the typing effect is completed
+    setTimeout(() => {
+      hljs.highlightAll();
+    }, 100);
   }, [index, htmlString, speed]);
 
   return <div dangerouslySetInnerHTML={{ __html: displayText }} />;
