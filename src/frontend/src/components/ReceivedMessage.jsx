@@ -30,7 +30,7 @@ export default function ReceivedMessage({
           className={`p-2 rounded-lg break-words text-sm mood-${moodToCSS[mood]}`}
         >
           {addTypingEffect ? (
-            <TypingEffect htmlString={sanitizedHTML} speed={15} />
+            <TypingEffect htmlString={sanitizedHTML} speed={10} />
           ) : (
             <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
           )}

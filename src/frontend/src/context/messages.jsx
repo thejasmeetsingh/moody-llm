@@ -1,4 +1,4 @@
-import { createContext, useCallback, useRef, useState } from "react";
+import { createContext, useRef, useState } from "react";
 
 const MessageContext = createContext();
 
@@ -23,7 +23,7 @@ function Provider({ children }) {
     setMessages((prevMessages) => [message, ...prevMessages]);
   };
 
-  const fetchAndSetUserID = async () => {
+  const fetchUserID = async () => {
     let _userID = sessionStorage.getItem("userID");
 
     if (!_userID) {
@@ -96,7 +96,7 @@ function Provider({ children }) {
         messageInputDisabled,
         scrollToBottom,
         toggleMessageInput,
-        fetchAndSetUserID,
+        fetchUserID,
         sendMessage,
       }}
     >
